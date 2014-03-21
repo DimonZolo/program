@@ -1,0 +1,103 @@
+from random import randint
+ 
+def create_board(x):
+    """Creates a board based on the number of ships"""
+    board = []
+    for i in range(x):
+        board.append(['O'] * x)
+    return board
+   
+def print_board(board):
+    """Prints board, unformatted"""
+    for row in board:
+        print(' '.join(row))
+ 
+def gen_ships():
+    """Generates a random number of ships and thier sizes"""
+    ship_num = randint(1, 6)
+    ship_dict = {}
+    # Generate ship sizes
+    for ship in range(ship_num):
+        ship_dict[ship] = [randint(0, 3)]
+    # Get ships and assign them as vertical or horizontal
+    for ship in ship_dict.keys():
+        v_h_num = randint(0, 1)
+        if v_h_num == 0:
+            ship_dict[ship].append('v')
+        else:
+            ship_dict[ship].append('h')
+    # Choose a board size based on the number of ships
+    if ship_num > 3:
+        board_size = 10
+    else:
+        board_size = 5
+    return board_size, ship_dict
+ 
+def place_ships(board, ships, x):
+    """Get's the ships and assigns them to board positions"""
+    # Place each ship one after the other onto the board
+    pos_Lst = []
+    new_pos = []
+    for ship in ships:
+        ship_size = ships[ship][0]
+        ship_dir = ships[ship][1]
+        row_x = randint(0, x - 1) # [i for i in x if x in range(0
+        col_y = randint(0, x - 1)
+        pos_Lst.append([row_x, col_y])
+        # Note that the for statement will iterate through the length of the
+        # ships size
+        for i in range(ship_size):
+            if ship_dir == 'h' and (row_x + i) in range(x - 1):
+                row_x += 1
+                pos_Lst.append([row_x + i, col_y])
+            elif ship_dir == 'h' and (row_x + i) not in range(x - 1) and (row_x - 1) in range(x - 1):
+                pos_Lst.append([row_x - i, col_y])
+                row_x -= 1
+            elif ship_dir == 'v' and (col_y + i) in range(x - 1):
+                pos_Lst.append([row_x, col_y + i])
+                col_y += 1
+            elif ship_dir == 'v' and (col_y + i) not in range(x - 1) and (col_y - 1) in range(x - 1):
+                pos_Lst.append([row_x, col_y - i])
+                col_y -= 1
+    for coords in pos_Lst:
+        if coords not in new_pos:
+            new_pos.append(coords)
+    return new_pos
+ 
+def player_move(board, x, coords):
+    """Get the player's move and check ships position."""
+    # There should be a way to ensure that the player doesn't
+    # enter a number outside of the range of the board
+    print(coords)
+    guess_row = int(input('Guess the row: '))
+    guess_col = int(input('Guess the column: '))
+    hits = []
+    for t in range(10):
+        player_guess = [guess_row, guess_col]
+        t += 1
+        if player_guess in coords:
+            print('Congradulations you hit a ship at coords:', player_guess)
+            hits.append('x')
+            board[guess_row][guess_col] = 'X'
+            print_board(new_board)
+            if t < 10 and len(hits) != len(coords):
+                print(coords)
+                guess_row = int(input('Guess the row: '))
+                guess_col = int(input('Guess the column: '))
+            else:
+                print('You won, all the ships have been destroyed')
+                break
+        else:
+            print('Sorry, you missed...Try again')
+            print('You have', t, 'tries left')
+            print_board(new_board)
+            print(coords)
+            guess_row = int(input('Guess the row: '))
+            guess_col = int(input('Guess the column: '))
+def scores(hit, sunk, missed):
+    return None
+ 
+board_size, ship_dict = gen_ships()
+new_board = create_board(board_size)
+print_board(new_board)
+player_move(new_board, board_size, place_ships(new_board, ship_dict, board_size))
